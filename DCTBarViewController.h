@@ -70,7 +70,7 @@ typedef enum {
  */
 - (void)setSize:(CGSize)size forBarMetrics:(UIBarMetrics)barMetrics;
 
-@property (nonatomic, strong) UIViewController *viewController;
+@property (nonatomic, strong) IBOutlet UIViewController *viewController;
 @property (nonatomic, strong) IBOutlet UIView *barView;
 
 /** The place for subclasses to load the content view.*/

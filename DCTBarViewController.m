@@ -187,15 +187,30 @@
 
 - (id)initWithViewController:(UIViewController *)aViewController {
 	
-	if (!(self = [super init])) return nil;
+	if (!(self = [self initWithNibName:nil bundle:nil])) return nil;
+	
+	self.viewController = aViewController;
+	
+	return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+	
+	if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
 	
 	self.wantsFullScreenLayout = NO;
-	self.viewController = aViewController;
 	barMetricsDictionary = [[NSMutableDictionary alloc] initWithCapacity:2];
 	
 	[self setSize:CGSizeMake(320.0f, 44.0f) forBarMetrics:UIBarMetricsDefault];
 	
 	return self;
+}
+
+- (void)awakeFromNib {
+	self.wantsFullScreenLayout = NO;
+	barMetricsDictionary = [[NSMutableDictionary alloc] initWithCapacity:2];
+	
+	[self setSize:CGSizeMake(320.0f, 44.0f) forBarMetrics:UIBarMetricsDefault];
 }
 
 - (void)setViewController:(UIViewController *)aViewController {
@@ -207,7 +222,7 @@
 	[self addChildViewController:self.viewController];
 }
 
-- (UIView *)contentView {
+- (UIView *)dctInternal_contentView {
 	
 	if (_contentView == nil) {
 		CGRect contentRect = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
@@ -249,10 +264,10 @@
 	if (animated) timeInterval = 1.0f / 3.0f;
 	
 	if (hidden) 
-		self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
+		self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 	else
 		completion = ^(BOOL finished) {
-			self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
+			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 			if (completion != nil) completion(finished);
 		};
 	
@@ -267,6 +282,8 @@
 
 - (CGRect)dctInternal_barFrameForInterfaceOrientation:(UIInterfaceOrientation)orientation
 											barHidden:(BOOL)theBarHidden {
+	
+	if (self.position == DCTBarPositionNone) return CGRectZero;
 	
 	CGSize size = [self dctInternal_sizeForOrientation:orientation];
 	
