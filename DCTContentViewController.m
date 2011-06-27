@@ -42,15 +42,17 @@
 
 - (CGRect)dctInternal_contentFrameForInterfaceOrientation:(UIInterfaceOrientation)orientation
 												barHidden:(BOOL)theBarHidden;
+
+- (CGSize)dctInternal_sizeForBarMetrics:(UIBarMetrics)barMetrics;
+- (CGSize)dctInternal_sizeForOrientation:(UIInterfaceOrientation)interfaceOrientation;
+
 @end
 
 @implementation DCTContentViewController
 
 @synthesize position, barView, contentView, viewController, barHidden;
-@synthesize portraitBarSize, landscapeBarSize;
 
-#pragma mark -
-#pragma mark UIViewController
+#pragma mark - UIViewController
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -152,12 +154,41 @@
 
 #pragma mark - DCTContentViewController
 
+- (void)setSize:(CGSize)size forBarMetrics:(UIBarMetrics)barMetrics {
+	
+	NSValue *sizeValue = [NSValue valueWithCGSize:size];
+	NSNumber *barMetricsNumber = [NSNumber numberWithInteger:barMetrics];
+	
+	[barMetricsDictionary setObject:sizeValue forKey:barMetricsNumber];
+}
+
+- (CGSize)dctInternal_sizeForBarMetrics:(UIBarMetrics)barMetrics {
+	NSNumber *barMetricsNumber = [NSNumber numberWithInteger:barMetrics];
+	
+	if (![[barMetricsDictionary allKeys] containsObject:barMetricsNumber])
+		barMetricsNumber = [NSNumber numberWithInteger:UIBarMetricsDefault];
+	
+	NSValue *sizeValue = [barMetricsDictionary objectForKey:barMetricsNumber];
+	return [sizeValue CGSizeValue];
+}
+
+- (CGSize)dctInternal_sizeForOrientation:(UIInterfaceOrientation)interfaceOrientation {
+	
+	if (UIInterfaceOrientationIsLandscape(interfaceOrientation))
+		return [self dctInternal_sizeForBarMetrics:UIBarMetricsLandscapePhone];
+	
+	return [self dctInternal_sizeForBarMetrics:UIBarMetricsDefault];
+}
+
 - (id)initWithViewController:(UIViewController *)aViewController {
 	
 	if (!(self = [super init])) return nil;
 	
 	self.wantsFullScreenLayout = NO;
 	self.viewController = aViewController;
+	barMetricsDictionary = [[NSMutableDictionary alloc] initWithCapacity:2];
+	
+	[self setSize:CGSizeMake(320.0f, 44.0f) forBarMetrics:UIBarMetricsDefault];
 	
 	return self;
 }
@@ -214,20 +245,15 @@
 	} completion:completion];
 }
 
-#pragma mark -
-#pragma mark Framing methods
+#pragma mark - Framing methods
 
 - (CGRect)dctInternal_barFrameForInterfaceOrientation:(UIInterfaceOrientation)orientation
 											barHidden:(BOOL)theBarHidden {
 	
-	CGFloat barWidth = self.landscapeBarSize.width;
-	CGFloat barHeight = self.landscapeBarSize.height;
+	CGSize size = [self dctInternal_sizeForOrientation:orientation];
 	
-	if (UIInterfaceOrientationIsPortrait(orientation)) {
-		barWidth = self.portraitBarSize.width;
-		barHeight = self.portraitBarSize.height;
-	}
-	
+	CGFloat barWidth = size.width;
+	CGFloat barHeight = size.height;
 	
 	// For some reason when in landscape the view size comes 
 	// back the same as the portrait, so I flip it here.
@@ -272,14 +298,11 @@
 	
 	if (theBarHidden) return self.view.bounds;
 	
-	CGFloat barWidth = self.landscapeBarSize.width;
-	CGFloat barHeight = self.landscapeBarSize.height;
+	CGSize size = [self dctInternal_sizeForOrientation:orientation];
 	
-	if (UIInterfaceOrientationIsPortrait(orientation)) {
-		barWidth = self.portraitBarSize.width;
-		barHeight = self.portraitBarSize.height;
-	}
-	
+	CGFloat barWidth = size.width;
+	CGFloat barHeight = size.height;
+		
 	CGRect rect = self.view.bounds;
 	
 	if (self.position == DCTContentBarPositionBottom) {

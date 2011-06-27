@@ -45,6 +45,7 @@ typedef enum {
 } DCTContentBarPosition;
 
 @interface DCTContentViewController : UIViewController {
+	__strong NSMutableDictionary *barMetricsDictionary;
 }
 
 /// @name Creating a Content View Controller
@@ -64,9 +65,13 @@ typedef enum {
  * `DCTContentBarPositionBottom` Show the bar view below the content view.
  
  */
-@property (nonatomic, assign) CGSize portraitBarSize, landscapeBarSize;
-
 @property (nonatomic, assign) DCTContentBarPosition position;
+
+/*
+ 
+ */
+- (void)setSize:(CGSize)size forBarMetrics:(UIBarMetrics)barMetrics;
+
 @property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, strong) IBOutlet UIView *barView, *contentView;
 
