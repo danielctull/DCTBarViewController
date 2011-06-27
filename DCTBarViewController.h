@@ -76,18 +76,6 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UIView *barView, *contentView;
 
 
-/// @name Methods for Subclasses to Override
-
-/** The frame to use for the bar.
- @return Frame to use.
- */
-- (CGRect)barFrame;
-
-/** The frame to use for the content.
- 
- @return Frame to use.
- */
-- (CGRect)contentFrame;
 
 /** The place for subclasses to load the content view.*/
 

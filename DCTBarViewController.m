@@ -45,7 +45,6 @@
 
 - (CGSize)dctInternal_sizeForBarMetrics:(UIBarMetrics)barMetrics;
 - (CGSize)dctInternal_sizeForOrientation:(UIInterfaceOrientation)interfaceOrientation;
-
 @end
 
 @implementation DCTBarViewController
@@ -62,16 +61,16 @@
 	self.barView.frame = [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation
 																 barHidden:self.barHidden];
 	
-	if (self.position == DCTContentBarPositionTop)
+	if (self.position == DCTBarPositionTop)
 		self.barView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin);
 	
-	else if (self.position == DCTContentBarPositionBottom)
+	else if (self.position == DCTBarPositionBottom)
 		self.barView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin);
 	
-	else if (self.position == DCTContentBarPositionRight)
+	else if (self.position == DCTBarPositionRight)
 		self.barView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin);
 	
-	else if (self.position == DCTContentBarPositionLeft)
+	else if (self.position == DCTBarPositionLeft)
 		self.barView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin);
 	
 	[self.view addSubview:self.barView];
@@ -203,8 +202,13 @@
 }
 
 - (UIView *)contentView {
+	
 	if (!contentView) [self loadContentView];
-	if (!contentView) contentView = [[UIView alloc] initWithFrame:[self contentFrame]];
+	
+	if (!contentView) {
+		CGRect contentRect = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
+		contentView = [[UIView alloc] initWithFrame:contentRect];
+	}
 	return contentView;
 }
 
@@ -213,8 +217,14 @@
 }
 
 - (UIView *)barView {
+	
 	if (!barView) [self loadBarView];
-	if (!barView) barView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 44.0f)];
+	
+	if (!barView) {
+		CGRect barRect = [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
+		barView = [[UIView alloc] initWithFrame:barRect];
+	}
+	
 	return barView;
 }
 
@@ -232,7 +242,7 @@
 	
 	barHidden = hidden;
 	
-	if (self.position == DCTContentBarPositionNone) return;
+	if (self.position == DCTBarPositionNone) return;
 		
 	NSTimeInterval timeInterval = 0.0f;
 	if (animated) timeInterval = 1.0f / 3.0f;
@@ -255,6 +265,8 @@
 	CGFloat barWidth = size.width;
 	CGFloat barHeight = size.height;
 	
+	CGRect viewFrame = self.view.frame;
+	/*
 	// For some reason when in landscape the view size comes 
 	// back the same as the portrait, so I flip it here.
 	// Must be a nicer way to check for this?
@@ -263,28 +275,28 @@
 		CGFloat height = viewFrame.size.height;
 		viewFrame.size.height = viewFrame.size.width;
 		viewFrame.size.width = height;
-	}
+	}*/
 	
 	CGRect rect = CGRectMake(0.0f, 0.0f, barWidth, barHeight);
 	
-	if (self.position == DCTContentBarPositionBottom)
+	if (self.position == DCTBarPositionBottom)
 		rect.origin.y = viewFrame.size.height - barHeight;
 	
-	else if (self.position == DCTContentBarPositionRight)
+	else if (self.position == DCTBarPositionRight)
 		rect.origin.x = viewFrame.size.width - barWidth;
 	
 	if (theBarHidden) {
 		
-		if (self.position == DCTContentBarPositionBottom)
+		if (self.position == DCTBarPositionBottom)
 			rect.origin.y = viewFrame.size.height;
 			
-		else if (self.position == DCTContentBarPositionTop)
+		else if (self.position == DCTBarPositionTop)
 			rect.origin.y = 0.0f - barHeight;
 		
-		else if (self.position == DCTContentBarPositionRight)
+		else if (self.position == DCTBarPositionRight)
 			rect.origin.x = viewFrame.size.width;
 			
-		else if (self.position == DCTContentBarPositionLeft)
+		else if (self.position == DCTBarPositionLeft)
 			rect.origin.x = 0.0f - barWidth;
 	}
 	
@@ -294,7 +306,7 @@
 - (CGRect)dctInternal_contentFrameForInterfaceOrientation:(UIInterfaceOrientation)orientation
 												barHidden:(BOOL)theBarHidden {
 	
-	if (self.position == DCTContentBarPositionNone) return self.view.bounds;
+	if (self.position == DCTBarPositionNone) return self.view.bounds;
 	
 	if (theBarHidden) return self.view.bounds;
 	
@@ -305,17 +317,17 @@
 		
 	CGRect rect = self.view.bounds;
 	
-	if (self.position == DCTContentBarPositionBottom) {
+	if (self.position == DCTBarPositionBottom) {
 		rect.size.height = rect.size.height - barHeight;
 	
-	} else if (self.position == DCTContentBarPositionTop) {
+	} else if (self.position == DCTBarPositionTop) {
 		rect.origin.y = barHeight;
 		rect.size.height = rect.size.height - barHeight;
 	
-	} else if (self.position == DCTContentBarPositionRight) {
+	} else if (self.position == DCTBarPositionRight) {
 		rect.size.width = rect.size.width - barWidth;
 		
-	} else if (self.position == DCTContentBarPositionLeft) {
+	} else if (self.position == DCTBarPositionLeft) {
 		rect.origin.x = barWidth;
 		rect.size.width = rect.size.width - barWidth;
 	}
@@ -323,43 +335,7 @@
 	return rect;
 }
 
-- (CGRect)barFrame {
-	return [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
-}
-
-- (CGRect)contentFrame {
-	
-	if (!self.barView) return self.view.bounds;
-	
-	if (self.position == DCTContentBarPositionBottom)
-		return CGRectMake(0.0f, 
-						  0.0f, 
-						  self.view.frame.size.width, 
-						  self.view.frame.size.height - self.barView.frame.size.height);
-	
-	else if (self.position == DCTContentBarPositionTop)
-		return CGRectMake(0.0f,
-						  self.barView.frame.size.height, 
-						  self.view.frame.size.width, 
-						  self.view.frame.size.height - self.barView.frame.size.height);
-	
-	else if (self.position == DCTContentBarPositionRight)
-		return CGRectMake(0.0f, 
-						  0.0f, 
-						  self.view.frame.size.width - self.barView.frame.size.width, 
-						  self.view.frame.size.height);
-	
-	else if (self.position == DCTContentBarPositionLeft)
-		return CGRectMake(self.barView.frame.size.width, 
-						  0.0f, 
-						  self.view.frame.size.width - self.barView.frame.size.width, 
-						  self.view.frame.size.height);
-	
-	return self.view.bounds;
-}
-
-#pragma mark -
-#pragma mark Methods for subclasses to use
+#pragma mark - Methods for subclasses to use
 
 - (void)loadContentView {}
 - (void)loadBarView {}
