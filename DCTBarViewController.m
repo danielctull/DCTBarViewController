@@ -46,6 +46,7 @@
 - (CGSize)dctInternal_sizeForBarMetrics:(UIBarMetrics)barMetrics;
 - (CGSize)dctInternal_sizeForOrientation:(UIInterfaceOrientation)interfaceOrientation;
 - (UIView *)dctInternal_contentView;
+- (void)dctInternal_checkShouldAnimateContentView;
 @end
 
 @implementation DCTBarViewController {
@@ -53,7 +54,7 @@
 	__strong UIView *_contentView;
 }
 
-@synthesize position, barView, viewController, barHidden;
+@synthesize position, barView, viewController, barHidden, animateContentView;
 
 #pragma mark - UIViewController
 
@@ -105,33 +106,6 @@
 
 - (UINavigationItem *)navigationItem {
 	return [self.viewController navigationItem];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-	[self.viewController didReceiveMemoryWarning];
-}
-
-#pragma mark - UIViewController view event methods
-
-- (void)viewDidAppear:(BOOL)animated {
-	[super viewDidAppear:animated];
-	[self.viewController viewDidAppear:animated];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-	[super viewWillAppear:animated];
-	[self.viewController viewWillAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-	[super viewWillDisappear:animated];
-	[self.viewController viewWillDisappear:animated];
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-	[super viewDidDisappear:animated];
-	[self.viewController viewDidDisappear:animated];
 }
 
 #pragma mark - UIViewController autorotation methods
@@ -213,6 +187,12 @@
 	[self setSize:CGSizeMake(320.0f, 44.0f) forBarMetrics:UIBarMetricsDefault];
 }
 
+- (void)setPosition:(DCTBarPosition)aPosition {
+	position = aPosition;
+	
+	[self dctInternal_checkShouldAnimateContentView];
+}
+
 - (void)setViewController:(UIViewController *)aViewController {
 	
 	if (self.viewController == aViewController) return;
@@ -220,6 +200,32 @@
 	[self.viewController removeFromParentViewController];
 	viewController = aViewController;
 	[self addChildViewController:self.viewController];
+	
+	[self dctInternal_checkShouldAnimateContentView];
+}
+
+- (void)dctInternal_checkShouldAnimateContentView {
+	
+	UIViewController *aViewController = self.viewController;
+	
+	self.animateContentView = NO;
+	
+	if (self.position == DCTBarPositionTop && [aViewController isKindOfClass:[UINavigationController class]]) {
+		self.animateContentView = YES;
+	}
+	
+	else if (self.position == DCTBarPositionBottom) {
+		
+		if ([aViewController isKindOfClass:[UITabBarController class]])
+			self.animateContentView = YES;
+		
+		if ([aViewController isKindOfClass:[UINavigationController class]]) {
+			
+			UINavigationController *nav = (UINavigationController *)aViewController;
+			
+			if (!nav.toolbarHidden) self.animateContentView = YES;
+		}
+	}
 }
 
 - (UIView *)dctInternal_contentView {
@@ -259,21 +265,26 @@
 	barHidden = hidden;
 	
 	if (self.position == DCTBarPositionNone) return;
-		
+	
 	NSTimeInterval timeInterval = 0.0f;
 	if (animated) timeInterval = 1.0f / 3.0f;
 	
-	if (hidden) 
-		self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
-	else
-		completion = ^(BOOL finished) {
+	if (!self.animateContentView) {
+		if (hidden) 
 			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
-			if (completion != nil) completion(finished);
-		};
+		else
+			completion = ^(BOOL finished) {
+				self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
+				if (completion != nil) completion(finished);
+			};
+	}
 	
 	[UIView animateWithDuration:timeInterval animations:^{
 		
 		self.barView.frame = [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
+		
+		if (self.animateContentView) 
+			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 		
 	} completion:completion];
 }

@@ -73,6 +73,8 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UIViewController *viewController;
 @property (nonatomic, strong) IBOutlet UIView *barView;
 
+@property (nonatomic, assign) BOOL animateContentView;
+
 /** The place for subclasses to load the content view.*/
 
 - (void)loadBarView;
