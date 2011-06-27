@@ -67,8 +67,8 @@ typedef enum {
 @property (nonatomic, assign) CGSize portraitBarSize, landscapeBarSize;
 
 @property (nonatomic, assign) DCTContentBarPosition position;
-@property (nonatomic, retain) UIViewController *viewController;
-@property (nonatomic, retain) IBOutlet UIView *barView, *contentView;
+@property (nonatomic, strong) UIViewController *viewController;
+@property (nonatomic, strong) IBOutlet UIView *barView, *contentView;
 
 
 /// @name Methods for Subclasses to Override

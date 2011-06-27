@@ -50,16 +50,6 @@
 @synthesize portraitBarSize, landscapeBarSize;
 
 #pragma mark -
-#pragma mark NSObject
-
-- (void)dealloc {
-	[viewController release];
-	[barView release];
-	[contentView release];
-    [super dealloc];
-}
-
-#pragma mark -
 #pragma mark UIViewController
 
 - (void)viewDidLoad {
@@ -115,8 +105,7 @@
 	[self.viewController didReceiveMemoryWarning];
 }
 
-#pragma mark -
-#pragma mark UIViewController view event methods
+#pragma mark - UIViewController view event methods
 
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
@@ -138,8 +127,7 @@
 	[self.viewController viewDidDisappear:animated];
 }
 
-#pragma mark -
-#pragma mark UIViewController autorotation methods
+#pragma mark - UIViewController autorotation methods
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
 	
@@ -162,42 +150,25 @@
 	
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-	[super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-	[self.viewController willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-	[super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-	[self.viewController didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-}
-
-- (void)willAnimateFirstHalfOfRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-	[super willAnimateFirstHalfOfRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-	[self.viewController willAnimateFirstHalfOfRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-}
-
-- (void)didAnimateFirstHalfOfRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	[super didRotateFromInterfaceOrientation:toInterfaceOrientation];
-	[self.viewController didRotateFromInterfaceOrientation:toInterfaceOrientation];
-}
-
-- (void)willAnimateSecondHalfOfRotationFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation duration:(NSTimeInterval)duration {
-	[super willAnimateSecondHalfOfRotationFromInterfaceOrientation:fromInterfaceOrientation duration:duration];
-	[self.viewController willAnimateSecondHalfOfRotationFromInterfaceOrientation:fromInterfaceOrientation duration:duration];
-}
-
-#pragma mark -
-#pragma mark DCTContentViewController
+#pragma mark - DCTContentViewController
 
 - (id)initWithViewController:(UIViewController *)aViewController {
 	
 	if (!(self = [super init])) return nil;
 	
 	self.wantsFullScreenLayout = NO;
-	viewController = [aViewController retain];
+	self.viewController = aViewController;
 	
 	return self;
+}
+
+- (void)setViewController:(UIViewController *)aViewController {
+	
+	if (self.viewController == aViewController) return;
+	
+	[self.viewController removeFromParentViewController];
+	viewController = aViewController;
+	[self addChildViewController:self.viewController];
 }
 
 - (UIView *)contentView {
