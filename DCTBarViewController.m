@@ -45,18 +45,24 @@
 
 - (CGSize)dctInternal_sizeForBarMetrics:(UIBarMetrics)barMetrics;
 - (CGSize)dctInternal_sizeForOrientation:(UIInterfaceOrientation)interfaceOrientation;
+- (UIView *)dctInternal_contentView;
 @end
 
-@implementation DCTBarViewController
+@implementation DCTBarViewController {
+	__strong NSMutableDictionary *barMetricsDictionary;
+	__strong UIView *_contentView;
+}
 
-@synthesize position, barView, contentView, viewController, barHidden;
+@synthesize position, barView, viewController, barHidden;
 
 #pragma mark - UIViewController
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
-	[self.view addSubview:self.contentView];
+	UIView *contentView = [self dctInternal_contentView];
+	
+	[self.view addSubview:contentView];
 	
 	self.barView.frame = [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation
 																 barHidden:self.barHidden];
@@ -74,23 +80,23 @@
 		self.barView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin);
 	
 	[self.view addSubview:self.barView];
-	self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
+	contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
 	UIViewAutoresizing resizing = (UIViewAutoresizingFlexibleHeight |
 								   UIViewAutoresizingFlexibleWidth);
 	
-	self.contentView.autoresizingMask = resizing;
+	contentView.autoresizingMask = resizing;
 	self.view.autoresizingMask = resizing;
 	self.viewController.view.autoresizingMask = resizing;
-	self.viewController.view.frame = self.contentView.bounds;
+	self.viewController.view.frame = contentView.bounds;
 	self.viewController.wantsFullScreenLayout = NO;
 	
-	[self.contentView addSubview:self.viewController.view];
+	[contentView addSubview:self.viewController.view];
 }
 
 - (void)viewDidUnload {
 	[super viewDidUnload];
-	self.contentView = nil;
 	self.barView = nil;
+	_contentView = nil;
 }
 
 - (UITabBarItem *)tabBarItem {
@@ -147,7 +153,7 @@
 	if (currentlyPortrait == toPortrait) return;
 	
 	self.barView.frame = [self dctInternal_barFrameForInterfaceOrientation:toInterfaceOrientation barHidden:self.barHidden];
-	self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:toInterfaceOrientation barHidden:self.barHidden];
+	[self dctInternal_contentView].frame = [self dctInternal_contentFrameForInterfaceOrientation:toInterfaceOrientation barHidden:self.barHidden];
 	
 }
 
@@ -203,17 +209,12 @@
 
 - (UIView *)contentView {
 	
-	if (!contentView) [self loadContentView];
-	
-	if (!contentView) {
+	if (_contentView == nil) {
 		CGRect contentRect = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:self.barHidden];
-		contentView = [[UIView alloc] initWithFrame:contentRect];
+		_contentView = [[UIView alloc] initWithFrame:contentRect];
 	}
-	return contentView;
-}
-
-- (BOOL)isContentViewLoaded {
-	return (contentView == nil);
+	
+	return _contentView;
 }
 
 - (UIView *)barView {
@@ -344,7 +345,6 @@
 
 #pragma mark - Methods for subclasses to use
 
-- (void)loadContentView {}
 - (void)loadBarView {}
 
 @end

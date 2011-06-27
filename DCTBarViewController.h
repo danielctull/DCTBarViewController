@@ -44,9 +44,7 @@ typedef enum {
 	DCTBarPositionBottom
 } DCTBarPosition;
 
-@interface DCTBarViewController : UIViewController {
-	__strong NSMutableDictionary *barMetricsDictionary;
-}
+@interface DCTBarViewController : UIViewController
 
 /// @name Creating a Content View Controller
 /**
@@ -73,19 +71,11 @@ typedef enum {
 - (void)setSize:(CGSize)size forBarMetrics:(UIBarMetrics)barMetrics;
 
 @property (nonatomic, strong) UIViewController *viewController;
-@property (nonatomic, strong) IBOutlet UIView *barView, *contentView;
-
-
+@property (nonatomic, strong) IBOutlet UIView *barView;
 
 /** The place for subclasses to load the content view.*/
 
 - (void)loadBarView;
-- (void)loadContentView;
-
-- (BOOL)isContentViewLoaded;
-
-// Publically Use:
-- (id)initWithViewController:(UIViewController *)aViewController;
 
 @property (nonatomic, assign) BOOL barHidden;
 - (void)setBarHidden:(BOOL)hidden animated:(BOOL)animated;
