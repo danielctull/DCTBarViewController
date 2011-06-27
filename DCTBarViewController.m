@@ -1,6 +1,6 @@
 /*
- DCTContentViewController.m
- DCTUIKit
+ DCTBarViewController.m
+ DCTBarViewController
  
  Created by Daniel Tull on 23.10.2009.
  
@@ -34,9 +34,9 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "DCTContentViewController.h"
+#import "DCTBarViewController.h"
 
-@interface DCTContentViewController ()
+@interface DCTBarViewController ()
 - (CGRect)dctInternal_barFrameForInterfaceOrientation:(UIInterfaceOrientation)orientation
 											barHidden:(BOOL)theBarHidden;
 
@@ -48,7 +48,7 @@
 
 @end
 
-@implementation DCTContentViewController
+@implementation DCTBarViewController
 
 @synthesize position, barView, contentView, viewController, barHidden;
 

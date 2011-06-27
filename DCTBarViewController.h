@@ -1,6 +1,6 @@
 /*
- DCTContentViewController.h
- DCTUIKit
+ DCTBarViewController.h
+ DCTBarViewController
  
  Created by Daniel Tull on 23.10.2009.
  
@@ -37,14 +37,14 @@
 #import <UIKit/UIKit.h>
 
 typedef enum {
-	DCTContentBarPositionNone = 0,
-	DCTContentBarPositionLeft,
-	DCTContentBarPositionRight,
-	DCTContentBarPositionTop,
-	DCTContentBarPositionBottom
-} DCTContentBarPosition;
+	DCTBarPositionNone = 0,
+	DCTBarPositionLeft,
+	DCTBarPositionRight,
+	DCTBarPositionTop,
+	DCTBarPositionBottom
+} DCTBarPosition;
 
-@interface DCTContentViewController : UIViewController {
+@interface DCTBarViewController : UIViewController {
 	__strong NSMutableDictionary *barMetricsDictionary;
 }
 
@@ -58,14 +58,14 @@ typedef enum {
  
  Possible values are:
  
- * `DCTContentBarPositionNone` Do not show the bar view - pretty pointless.
- * `DCTContentBarPositionLeft` Show the bar view on the left.
- * `DCTContentBarPositionRight` Show the bar view on the right.
- * `DCTContentBarPositionTop` Show the bar view above the content view.
- * `DCTContentBarPositionBottom` Show the bar view below the content view.
+ * `DCTBarPositionNone` Do not show the bar view - pretty pointless.
+ * `DCTBarPositionLeft` Show the bar view on the left.
+ * `DCTBarPositionRight` Show the bar view on the right.
+ * `DCTBarPositionTop` Show the bar view above the content view.
+ * `DCTBarPositionBottom` Show the bar view below the content view.
  
  */
-@property (nonatomic, assign) DCTContentBarPosition position;
+@property (nonatomic, assign) DCTBarPosition position;
 
 /*
  
