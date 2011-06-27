@@ -365,3 +365,22 @@
 - (void)loadBarView {}
 
 @end
+
+@implementation UIViewController (DCTBarViewController)
+
+
+- (id)dct_ancestorViewControllerOfClass:(Class)aClass {
+	
+	UIViewController *vc = self;
+	
+	while (vc != nil) {
+		
+		if ([vc isKindOfClass:aClass]) return vc;
+		
+		vc = vc.parentViewController;
+	}
+	
+	return nil;
+}
+
+@end

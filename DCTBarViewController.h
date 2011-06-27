@@ -82,3 +82,8 @@ typedef enum {
 - (void)setBarHidden:(BOOL)hidden animated:(BOOL)animated completion:(void (^)(BOOL finished))completion;
 
 @end
+
+@interface UIViewController (DCTBarViewController)
+- (id)dct_ancestorViewControllerOfClass:(Class)aClass;
+@end
+
