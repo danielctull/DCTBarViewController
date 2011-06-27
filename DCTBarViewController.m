@@ -46,7 +46,6 @@
 - (CGSize)dctInternal_sizeForBarMetrics:(UIBarMetrics)barMetrics;
 - (CGSize)dctInternal_sizeForOrientation:(UIInterfaceOrientation)interfaceOrientation;
 - (UIView *)dctInternal_contentView;
-- (void)dctInternal_checkShouldAnimateContentView;
 @end
 
 @implementation DCTBarViewController {
@@ -54,7 +53,7 @@
 	__strong UIView *_contentView;
 }
 
-@synthesize position, barView, viewController, barHidden, animateContentView;
+@synthesize position, barView, viewController, barHidden;
 
 #pragma mark - UIViewController
 
@@ -189,8 +188,6 @@
 
 - (void)setPosition:(DCTBarPosition)aPosition {
 	position = aPosition;
-	
-	[self dctInternal_checkShouldAnimateContentView];
 }
 
 - (void)setViewController:(UIViewController *)aViewController {
@@ -200,32 +197,6 @@
 	[self.viewController removeFromParentViewController];
 	viewController = aViewController;
 	[self addChildViewController:self.viewController];
-	
-	[self dctInternal_checkShouldAnimateContentView];
-}
-
-- (void)dctInternal_checkShouldAnimateContentView {
-	
-	UIViewController *aViewController = self.viewController;
-	
-	self.animateContentView = NO;
-	
-	if (self.position == DCTBarPositionTop && [aViewController isKindOfClass:[UINavigationController class]]) {
-		self.animateContentView = YES;
-	}
-	
-	else if (self.position == DCTBarPositionBottom) {
-		
-		if ([aViewController isKindOfClass:[UITabBarController class]])
-			self.animateContentView = YES;
-		
-		if ([aViewController isKindOfClass:[UINavigationController class]]) {
-			
-			UINavigationController *nav = (UINavigationController *)aViewController;
-			
-			if (!nav.toolbarHidden) self.animateContentView = YES;
-		}
-	}
 }
 
 - (UIView *)dctInternal_contentView {
@@ -250,15 +221,26 @@
 	return barView;
 }
 
-- (void)setBarHidden:(BOOL)aBool {
-	[self setBarHidden:aBool animated:NO completion:nil];
+- (void)setBarHidden:(BOOL)hidden {
+	[self setBarHidden:hidden animated:NO animatingContentView:YES completion:nil];
 }
 
 - (void)setBarHidden:(BOOL)hidden animated:(BOOL)animated {
-	[self setBarHidden:hidden animated:animated completion:nil];
+	[self setBarHidden:hidden animated:animated animatingContentView:YES completion:nil];
+}
+
+- (void)setBarHidden:(BOOL)hidden animated:(BOOL)animated animatingContentView:(BOOL)animatingContentView {
+	[self setBarHidden:hidden animated:animated animatingContentView:animatingContentView completion:nil];
 }
 
 - (void)setBarHidden:(BOOL)hidden animated:(BOOL)animated completion:(void (^)(BOOL finished))completion {
+	[self setBarHidden:hidden animated:animated animatingContentView:YES completion:completion];
+}
+
+- (void)setBarHidden:(BOOL)hidden 
+			animated:(BOOL)animated
+animatingContentView:(BOOL)animatingContentView
+		  completion:(void (^)(BOOL finished))completion {
 	
 	if (barHidden == hidden) return;
 	
@@ -269,7 +251,7 @@
 	NSTimeInterval timeInterval = 0.0f;
 	if (animated) timeInterval = 1.0f / 3.0f;
 	
-	if (!self.animateContentView) {
+	if (!animatingContentView) {
 		if (hidden) 
 			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 		else
@@ -283,7 +265,7 @@
 		
 		self.barView.frame = [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 		
-		if (self.animateContentView) 
+		if (animatingContentView) 
 			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 		
 	} completion:completion];
