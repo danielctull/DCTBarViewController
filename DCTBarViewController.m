@@ -247,10 +247,17 @@
 	NSTimeInterval timeInterval = 0.0f;
 	if (animated) timeInterval = 1.0f / 3.0f;
 	
+	if (hidden) 
+		self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
+	else
+		completion = ^(BOOL finished) {
+			self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
+			if (completion != nil) completion(finished);
+		};
+	
 	[UIView animateWithDuration:timeInterval animations:^{
 		
 		self.barView.frame = [self dctInternal_barFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
-		self.contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 		
 	} completion:completion];
 }
