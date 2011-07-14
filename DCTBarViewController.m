@@ -254,11 +254,15 @@ animatingContentView:(BOOL)animatingContentView
 	if (!animatingContentView) {
 		if (hidden) 
 			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
-		else
+		else {
+			
+			__block void (^completionBlock)(BOOL finished) = completion;
+			
 			completion = ^(BOOL finished) {
 				self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
-				if (completion != nil) completion(finished);
+				if (completionBlock) completionBlock(finished);
 			};
+		}
 	}
 	
 	[UIView animateWithDuration:timeInterval animations:^{
