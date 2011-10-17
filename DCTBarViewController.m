@@ -256,7 +256,7 @@ animatingContentView:(BOOL)animatingContentView
 			self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
 		else {
 			
-			__block void (^completionBlock)(BOOL finished) = completion;
+			void (^completionBlock)(BOOL finished) = completion;
 			
 			completion = ^(BOOL finished) {
 				self.dctInternal_contentView.frame = [self dctInternal_contentFrameForInterfaceOrientation:self.interfaceOrientation barHidden:hidden];
